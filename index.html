@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cash Drawer Counter</title>
+  <style>
+    :root {
+      --bg: #cfcfd1;
+      --primary: #b70a2c;
+      --accent1: #5dc0c5;
+      --accent2: yellow;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: var(--bg);
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    table {
+      width: 100%;
+      max-width: 360px;
+      table-layout: fixed;
+      border-collapse: collapse;
+      background-color: var(--bg);
+    }
+
+    th, td {
+      border: 1px solid var(--primary);
+      padding: 0.5rem;
+      font-size: 1rem;
+      text-align: center;
+      width: 33%;
+    }
+
+    input[type="number"] {
+      width: 60px;
+      font-size: 1rem;
+      text-align: center;
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 4px;
+      color: #000;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent1);
+      box-shadow: 0 0 5px var(--accent1);
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: var(--accent1);
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--accent2);
+    }
+
+    tfoot td {
+      font-weight: bold;
+      background-color: var(--primary);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cash Drawer Counter</h1>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Qty</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody id="cashTable"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">Grand Total</td>
+        <td id="grandTotal">$0.00</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <script>
+    const denominations = [
+      { label: "$100", value: 100 },
+      { label: "$50", value: 50 },
+      { label: "$20", value: 20 },
+      { label: "$10", value: 10 },
+      { label: "$5", value: 5 },
+      { label: "$1", value: 1 },
+      { label: "50¢", value: 0.5 },
+      { label: "25¢", value: 0.25 },
+      { label: "10¢", value: 0.10 },
+      { label: "5¢", value: 0.05 },
+      { label: "1¢", value: 0.01 }
+    ];
+
+    const tableBody = document.getElementById("cashTable");
+
+    denominations.forEach((denom, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${denom.label}</td>
+        <td><input type="number" min="0" max="999" maxlength="3" id="qty${index}" /></td>
+        <td id="total${index}">$0.00</td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    function updateTotals() {
+      let grandTotal = 0;
+      denominations.forEach((denom, index) => {
+        const qtyInput = document.getElementById(`qty${index}`);
+        let qty = parseInt(qtyInput.value) || 0;
+        if (qty > 999) qty = 999;
+        const total = qty * denom.value;
+        grandTotal += total;
+        document.getElementById(`total${index}`).innerText = `$${total.toFixed(2)}`;
+      });
+      document.getElementById("grandTotal").innerText = `$${grandTotal.toFixed(2)}`;
+    }
+
+    denominations.forEach((_, index) => {
+      document.getElementById(`qty${index}`).addEventListener("input", updateTotals);
+    });
+
+    updateTotals();
+  </script>
+</body>
+</html>
